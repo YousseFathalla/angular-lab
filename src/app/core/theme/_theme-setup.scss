@@ -1,0 +1,20 @@
+@use '@angular/material' as mat;
+
+// This mixin encapsulates the M3 theme logic for easy reuse
+@mixin apply-theme($primary: null, $tertiary: null) {
+  @include mat.system-classes();
+
+  @include mat.theme((
+    color: (
+      theme-type: color-scheme,
+      primary: if($primary, $primary, mat.$azure-palette),
+      tertiary: if($tertiary, $tertiary, mat.$blue-palette),
+    ),
+    typography: Google Sans Flex,
+    density: 0,
+  ));
+}
+
+// Utility classes for easy access to theme variables
+.mat-bg-surface { background-color: var(--mat-sys-surface); }
+.mat-text-on-surface { color: var(--mat-sys-on-surface); }

@@ -1,0 +1,14 @@
+.custom-scrollbar {
+  &::-webkit-scrollbar {
+    height: 8px !important;
+    width: 8px !important;
+  }
+  &::-webkit-scrollbar-track {
+    background: var(--mat-sys-secondary-container) !important; /* note: Use system color of project */
+    border-radius: 9999px !important;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--mat-sys-primary) !important; /* note: Use system color of project */
+    border-radius: 9999px !important;
+  }
+}
