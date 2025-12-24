@@ -6,7 +6,7 @@ import { Injectable, isDevMode } from '@angular/core';
  * - Suppressed in Production (can be extended to send logs to external services like Sentry).
  */
 @Injectable({ providedIn: 'root' })
-export class LogService {
+export class LoggerService {
   private readonly isDev = isDevMode();
 
   error(message: string, ...args: unknown[]): void {

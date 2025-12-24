@@ -15,22 +15,22 @@ import {
   QueryDocumentSnapshot,
 } from '@angular/fire/firestore';
 import { firstValueFrom, map, Observable } from 'rxjs';
-import { runInContextHelper$ } from '@shared/utilities/runInInjection-factory';
 import {
-  CursorDoc,
-  PaginationConfig,
-  PaginationDirection,
   PaginationServiceInterface,
+  PaginationConfig,
   PaginationState,
+  CursorDoc,
+  PaginationDirection,
   WhereClause,
-} from '@shared/types/pagination.types';
-import { LoggerService } from '@shared/services/logger/logger.service';
+} from './pagination.types';
+import { runInContextHelper$ } from '@shared/components/reusable-table/runInInjection-factory';
+import { LoggerService } from '@core/logger/logger.service';
 
 export class PaginationService<T extends DocumentData> implements PaginationServiceInterface<T> {
-  private firestore = inject(Firestore);
-  private injector = inject(Injector);
-  private logger = inject(LoggerService);
-  private runWithContext = runInContextHelper$();
+  private readonly firestore = inject(Firestore);
+  private readonly injector = inject(Injector);
+  private readonly logger = inject(LoggerService);
+  private readonly runWithContext = runInContextHelper$();
 
   // * Collection path and configuration
   private config: Required<PaginationConfig> & { useCollectionGroup: boolean } = {
@@ -42,7 +42,7 @@ export class PaginationService<T extends DocumentData> implements PaginationServ
   };
 
   // * Signal-based state
-  private _state = signal<PaginationState>({
+  private readonly _state = signal<PaginationState>({
     page: 1,
     limit: 10,
     total: 0,
@@ -53,7 +53,7 @@ export class PaginationService<T extends DocumentData> implements PaginationServ
   });
 
   // * Items signal
-  private _items = signal<T[]>([]);
+  private readonly _items = signal<T[]>([]);
 
   // * Flag to prevent duplicate count queries
   private _isUpdatingCount = false;
@@ -110,9 +110,8 @@ export class PaginationService<T extends DocumentData> implements PaginationServ
           }));
           targetPage = 1;
           break;
-        case 'last':
-          // Optimized: Use reverse pagination to fetch last page in a single request
-          // Instead of making N sequential requests, reverse the order and get the first page
+        case 'last': // Instead of making N sequential requests, reverse the order and get the first page // Optimized: Use reverse pagination to fetch last page in a single request
+        {
           const totalPages = this.totalPages();
           if (totalPages > 1) {
             await this.fetchLastPageOptimized();
@@ -121,6 +120,7 @@ export class PaginationService<T extends DocumentData> implements PaginationServ
             targetPage = 1;
           }
           break;
+        }
       }
 
       await this.fetchPage(targetPage);
@@ -132,7 +132,6 @@ export class PaginationService<T extends DocumentData> implements PaginationServ
       }));
     }
   }
-
 
   // * Change page size
   async setPageSize(limit: number): Promise<void> {
@@ -147,7 +146,10 @@ export class PaginationService<T extends DocumentData> implements PaginationServ
     await this.refresh();
   }
   // * Set query
-  async setQuery(where: WhereClause[], orderBy: { field: string; direction: 'asc' | 'desc' }[]): Promise<void> {
+  async setQuery(
+    where: WhereClause[],
+    orderBy: { field: string; direction: 'asc' | 'desc' }[]
+  ): Promise<void> {
     // 1. Update the internal config
     this.config.where = where ?? [];
     this.config.orderBy = orderBy ?? [{ field: 'updatedAt', direction: 'desc' }];
@@ -226,10 +228,7 @@ export class PaginationService<T extends DocumentData> implements PaginationServ
     this._items.set([]);
 
     try {
-      const [pageResult] = await Promise.all([
-        this.fetchPageData(1),
-        this.updateTotalCount(true),
-      ]);
+      const [pageResult] = await Promise.all([this.fetchPageData(1), this.updateTotalCount(true)]);
 
       if (pageResult.lastDoc) {
         this.storeCursor(1, pageResult.lastDoc);
@@ -283,11 +282,14 @@ export class PaginationService<T extends DocumentData> implements PaginationServ
         ? this.withInjection(() => collectionGroup(this.firestore, collectionPath))
         : this.withInjection(() => collection(this.firestore, collectionPath));
       const constraints = this.buildWhereConstraints();
-      const q = constraints.length > 0
-        ? this.withInjection(() => query(collectionRef, ...constraints))
-        : collectionRef;
+      const q =
+        constraints.length > 0
+          ? this.withInjection(() => query(collectionRef, ...constraints))
+          : collectionRef;
       return this.runWithInjection(() => getCountFromServer(q));
-    }, `Failed to get total count for ${collectionPath}`).pipe(map((snapshot) => snapshot.data().count));
+    }, `Failed to get total count for ${collectionPath}`).pipe(
+      map((snapshot) => snapshot.data().count)
+    );
   }
 
   private async fetchPageData(targetPage: number): Promise<{
@@ -313,7 +315,7 @@ export class PaginationService<T extends DocumentData> implements PaginationServ
         // Add cursor for pagination (skip if page 1)
         if (targetPage > 1) {
           const cursor = this._state().cursors.get(targetPage - 1);
-          if (cursor && cursor.snapshot) {
+          if (cursor?.snapshot) {
             constraints.push(startAfter(cursor.snapshot));
           }
         }
@@ -356,12 +358,7 @@ export class PaginationService<T extends DocumentData> implements PaginationServ
       }
 
       this._items.set(items);
-      this.ensureTotalFloor(
-        targetPage,
-        this._state().limit,
-        items.length,
-        hasMore
-      );
+      this.ensureTotalFloor(targetPage, this._state().limit, items.length, hasMore);
 
       // Set loading to false after both data fetch and total count are complete
       this._state.update((state) => ({
@@ -399,7 +396,7 @@ export class PaginationService<T extends DocumentData> implements PaginationServ
       // Reverse the order direction to query from the end
       const reversedOrderBy = this.config.orderBy.map((order) => ({
         field: order.field,
-        direction: order.direction === 'asc' ? 'desc' : 'asc' as 'asc' | 'desc',
+        direction: order.direction === 'asc' ? 'desc' : ('asc' as 'asc' | 'desc'),
       }));
 
       const snapshot = await firstValueFrom(
@@ -445,7 +442,7 @@ export class PaginationService<T extends DocumentData> implements PaginationServ
 
       // Store cursor for potential next page (though there shouldn't be one on last page)
       if (reversedDocs.length > 0) {
-        const lastDoc = reversedDocs[reversedDocs.length - 1];
+        const lastDoc = reversedDocs.at(-1);
         this.storeCursor(totalPages, lastDoc);
       }
 
@@ -471,7 +468,12 @@ export class PaginationService<T extends DocumentData> implements PaginationServ
     return Promise.resolve(runInInjectionContext(this.injector, operation));
   }
 
-  private ensureTotalFloor(page: number, limit: number, itemsLength: number, hasMore: boolean): void {
+  private ensureTotalFloor(
+    page: number,
+    limit: number,
+    itemsLength: number,
+    hasMore: boolean
+  ): void {
     const base = (page - 1) * limit + itemsLength;
     const minimumTotal = hasMore ? base + 1 : base;
 
