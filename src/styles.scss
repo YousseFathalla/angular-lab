@@ -39,3 +39,25 @@ html,
 body {
   height: 100%;
 }
+// Note: override should be in the root example below
+:root {
+  //* toolbar
+  @include mat.toolbar-overrides((
+    title-text-size: 1.5rem,
+    title-text-weight: 500,
+  ));
+}
+
+* {
+  &::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: var(--mat-sys-secondary-container);
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--mat-sys-primary);
+    border-radius: 10px;
+  }
+}

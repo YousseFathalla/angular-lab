@@ -27,31 +27,14 @@ export default defineConfig([
       '@angular-eslint/no-uncalled-signals': 'error',
       // 2. Dependency Injection: Prefer inject() over constructor
       '@angular-eslint/prefer-inject': 'error',
-      // 3. Strict Naming & Structure
-      '@angular-eslint/directive-selector': [
-        'error',
-        {
-          type: 'attribute',
-          prefix: [],
-          style: 'camelCase',
-        },
-      ],
-      '@angular-eslint/component-selector': [
-        'error',
-        {
-          type: 'element',
-          prefix: 'app',
-          style: 'kebab-case',
-        },
-      ],
 
-      // 4. Strict Types & Decorators
+      // 3. Strict Types & Decorators
       '@typescript-eslint/no-explicit-any': 'error',
       '@angular-eslint/no-attribute-decorator': 'error',
       '@angular-eslint/no-input-rename': 'error',
       '@angular-eslint/no-output-rename': 'error',
 
-      // 5. Component Best Practices
+      // 4. Component Best Practices
       '@angular-eslint/use-component-view-encapsulation': 'warn',
     },
   },
@@ -59,11 +42,11 @@ export default defineConfig([
     files: ['**/*.html'],
     extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility],
     rules: {
-      // 6. Force modern control flow (@if, @for)
+      // 5. Force modern control flow (@if, @for)
       '@angular-eslint/template/prefer-control-flow': 'error',
       '@angular-eslint/template/no-interpolation-in-attributes': 'error',
 
-      // 7. Clean Templates
+      // 6. Clean Templates
       '@angular-eslint/template/prefer-self-closing-tags': 'error',
       '@angular-eslint/template/conditional-complexity': ['error', { maxComplexity: 3 }],
     },
