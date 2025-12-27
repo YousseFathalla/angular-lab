@@ -1,0 +1,48 @@
+@use '@angular/material' as mat;
+
+//* Material Breakpoints
+$handset-portrait: '(max-width: 599.98px) and (orientation: portrait)';
+$handset-landscape: '(max-width: 959.98px) and (orientation: landscape)';
+
+:root {
+  //* sidenav
+  @include mat.sidenav-overrides((
+    container-shape: 0,
+    container-width: 15rem,
+    container-background-color: var(--mat-sys-primary-container),
+    container-text-color: var(--mat-sys-on-primary-container),
+  ));
+
+}
+
+//! classes for specific cases
+
+//* toolbar
+mat-toolbar-row.header {
+  @include mat.toolbar-overrides((
+    title-text-size: 1.5rem,
+    title-text-weight: 500,
+  ));
+}
+mat-toolbar-row.sub-header {
+  @include mat.toolbar-overrides((
+    title-text-size: 1.25rem,
+    title-text-weight: 400,
+  ));
+}
+
+//! media queries
+
+//* Handset Portrait & Landscape Overrides
+@media #{$handset-portrait}, #{$handset-landscape} {
+  :root {
+    @include mat.toolbar-overrides((
+      title-text-size: 1.125rem,
+      title-text-weight: 450,
+    ));
+
+    @include mat.sidenav-overrides((
+      container-width: 70dvw,
+    ));
+  }
+}

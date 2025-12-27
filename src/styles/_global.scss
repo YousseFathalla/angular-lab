@@ -1,0 +1,24 @@
+@use '@angular/material' as mat;
+
+body {
+  height: 100%;
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+}
+
+// Global UI Fixes (Scrollbars, etc.)
+* {
+  &::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: var(--mat-sys-secondary-container);
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--mat-sys-primary);
+    border-radius: 10px;
+  }
+}

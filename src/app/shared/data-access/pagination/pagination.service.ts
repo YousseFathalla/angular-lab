@@ -23,7 +23,7 @@ import {
   PaginationDirection,
   WhereClause,
 } from './pagination.types';
-import { runInContextHelper$ } from '@shared/components/reusable-table/runInInjection-factory';
+import { runInContextHelper$ } from '@shared/ui/reusable-table/runInInjection-factory';
 import { LoggerService } from '@core/logger/logger.service';
 
 export class PaginationService<T extends DocumentData> implements PaginationServiceInterface<T> {

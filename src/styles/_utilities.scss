@@ -1,0 +1,5 @@
+// Custom utility classes go here
+/* Flip directional icons in RTL mode */
+[dir='rtl'] .rtl-flip {
+  transform: scaleX(-1);
+}
